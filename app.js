@@ -2,6 +2,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+
+// LOAD USER MODEL
+require('./models/User');
 
 // PASSPORT CONFIG
 require('./config/passport')(passport);
@@ -14,7 +19,7 @@ mongoose.Promise = global.Promise;
 
 // CONNECT MONGOOSE DB (mLab)
 mongoose.connect(keys.mongoURI, {
-    useMongoClient: true
+    useNewUrlParser: true
 })
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => console.log(err));
@@ -29,6 +34,24 @@ const app = express();
 // ROUTES
 app.get('/', (req, res) => {
     res.send('Index Landing Page');
+});
+
+// --- USE MIDDLEWARE --- //
+
+app.use(cookieParser());
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false
+}));
+
+// PASSPORT MIDDLEWARE
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+    res.locals.user = req.user || null
+    next();
 });
 
 // USE ROUTES 

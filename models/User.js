@@ -24,4 +24,4 @@ const UserSchema = new Schema({
 });
 
 // CREATE COLLECTION AND ADD SCHEMA
-mongoose.model('user', UserSchema);
+mongoose.model('users', UserSchema);
